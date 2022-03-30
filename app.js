@@ -23,15 +23,44 @@ const paddle_pos = [
     {x:pongField_El.width - (width + padding),y:pongField_El.height / 2 - (height / 2)}
 ]
 
+//Specify direction
+const direction={
+up:false,
+down:false
+}
+
 let left_score = 0;
 let right_score = 0;
 let start = false;
+let dy = 5;
+let dx = 5;
 
 window.addEventListener('keyup', e => {
   if (e.key === 'Enter') {
     start = true;
   }
 });
+
+//When key is released then set back direction to its default state
+window.addEventListener('keyup', e => {
+ if(e.key === 'ArrowUp' || e.key === 'w'){
+    direction.up=false;
+ }else if(e.key === 'ArrowDown' || e.key === 's'){
+    direction.down=false;
+ }
+});
+
+function changeDirOfLeftPaddle(e){
+    if(e.key === 'ArrowUp' || e.key === 'w'){
+    direction.up=true;
+    }else if(e.key === 'ArrowDown' || e.key === 's'){
+    direction.down=true;
+    }
+    }
+  
+
+//Change direction of left paddle
+window.addEventListener('keydown',changeDirOfLeftPaddle)
 
   function draw() {
       //Draw paddle
@@ -49,7 +78,18 @@ window.addEventListener('keyup', e => {
   function update() {
     //Call draw method
     draw();
+    //Move left paddle
+    moveLeftPaddle()
   }
+
+  function moveLeftPaddle(){
+  if(direction.up){
+  paddle_pos[0].y -=dy;
+  }else if(direction.down){
+  paddle_pos[0].y +=dy;
+  }
+  }
+
 
   function drawLeftScore(){
   c.fillStyle='#fff'
