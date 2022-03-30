@@ -80,6 +80,18 @@ window.addEventListener('keydown',changeDirOfLeftPaddle)
     draw();
     //Move left paddle
     moveLeftPaddle()
+    //Set boundary limits for paddles
+    setBoundaryLimits()
+  }
+
+  function setBoundaryLimits(){
+  paddle_pos.forEach((paddle)=>{
+  if(paddle.y + height > pongField_El.height){
+  paddle.y = pongField_El.height - height;
+  }else if(paddle.y + height < height ){
+  paddle.y = 0;
+  }
+  })
   }
 
   function moveLeftPaddle(){
@@ -89,7 +101,6 @@ window.addEventListener('keydown',changeDirOfLeftPaddle)
   paddle_pos[0].y +=dy;
   }
   }
-
 
   function drawLeftScore(){
   c.fillStyle='#fff'
