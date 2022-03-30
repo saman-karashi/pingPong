@@ -32,8 +32,9 @@ down:false
 let left_score = 0;
 let right_score = 0;
 let start = false;
-let dy = 5;
-let dx = 5;
+let dy = -5; //Ball dy
+let dx = 5; // Ball dx
+let speed = 5; //Speed of paddles
 
 window.addEventListener('keyup', e => {
   if (e.key === 'Enter') {
@@ -82,6 +83,19 @@ window.addEventListener('keydown',changeDirOfLeftPaddle)
     moveLeftPaddle()
     //Set boundary limits for paddles
     setBoundaryLimits()
+    //Check if the ball hits left
+    hitsLeft()
+    //Check if the ball hits right
+    hitsRight()
+    //Check if the ball hits top & bottom
+    hitsTopBottom()
+    //Check if the ball hits player 
+    hitsPlayer()
+    //Check if the ball hits enemy 
+    hitsEnemy()
+    //Move the ball
+    moveBall()
+
   }
 
   function setBoundaryLimits(){
@@ -96,11 +110,63 @@ window.addEventListener('keydown',changeDirOfLeftPaddle)
 
   function moveLeftPaddle(){
   if(direction.up){
-  paddle_pos[0].y -=dy;
+  paddle_pos[0].y -=speed;
   }else if(direction.down){
-  paddle_pos[0].y +=dy;
+  paddle_pos[0].y +=speed;
   }
   }
+
+function hitsRight(){
+return ball_pos.x > pongField_El.width
+}
+
+
+function hitsLeft(){
+return ball_pos.x < 0   
+}
+
+
+function hitsTopBottom(){
+return ball_pos.y > pongField_El.height - ball_size.height || ball_pos.y < ball_size.height
+}
+
+
+function hitsEnemy(){
+return  ball_pos.y <= paddle_pos[1].y + height && ball_pos.y > paddle_pos[1].y && ball_pos.x >= paddle_pos[1].x
+}
+
+function hitsPlayer(){
+return  ball_pos.y <= paddle_pos[0].y + height && ball_pos.y > paddle_pos[0].y && ball_pos.x == paddle_pos[0].x + width
+}
+
+
+function moveBall(){
+if(hitsTopBottom()){
+dy = -dy
+}
+
+if(hitsEnemy() || hitsPlayer()){
+dx = -dx;
+}
+
+if(hitsLeft()){
+ball_pos.x = pongField_El.width / 2
+ball_pos.y = pongField_El.height / 2
+left_score+=1;
+dx=-dx
+}
+
+if(hitsRight()){
+ball_pos.x = pongField_El.width / 2
+ball_pos.y = pongField_El.height / 2
+right_score+=1;
+dx=-dx
+}
+
+ball_pos.x +=dx;
+ball_pos.y +=dy;
+}
+
 
   function drawLeftScore(){
   c.fillStyle='#fff'
