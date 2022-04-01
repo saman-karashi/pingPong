@@ -35,6 +35,7 @@ let start = false;
 let dy = -5; //Ball dy
 let dx = 5; // Ball dx
 let speed = 4; //Speed of paddles
+let interval;
 
 window.addEventListener('keyup', e => {
   if (e.key === 'Enter') {
@@ -95,6 +96,10 @@ window.addEventListener('keydown',changeDirOfLeftPaddle)
     hitsEnemy()
     //Move the ball
     moveBall()
+    //Check if left or right score is equal to ..
+    checkRightScoreState()
+    //Check if left or right score is equal to ..
+    checkLeftScoreState()
 
   }
 
@@ -141,6 +146,34 @@ return  ball_pos.y <= paddle_pos[0].y + height && ball_pos.y >= paddle_pos[0].y 
 }
 
 
+function checkRightScoreState(){
+if(right_score === 6){
+clearInterval(interval)
+c.font= '25px sans-serif'
+c.fillStyle='red'
+c.fillText('Game Over' , pongField_El.width / 2 , 80)
+
+setTimeout(()=>{
+window.location.reload()
+},1500)
+}
+
+}
+
+function checkLeftScoreState(){
+if(left_score === 6){
+    clearInterval(interval)
+    c.font= '25px sans-serif'
+    c.fillStyle='green'
+    c.fillText('You won' , pongField_El.width / 2 , 80)
+    
+    setTimeout(()=>{
+    window.location.reload()
+    },1500)
+}
+}
+
+
 function moveBall(){
 if(hitsTopBottom()){
 dy = -dy
@@ -153,7 +186,7 @@ dx = -dx;
 if(hitsLeft()){
 ball_pos.x = pongField_El.width / 2
 ball_pos.y = pongField_El.height / 2
-left_score+=1;
+right_score+=1;
 dx=-dx
 dy=-dy
 }
@@ -161,7 +194,7 @@ dy=-dy
 if(hitsRight()){
 ball_pos.x = pongField_El.width / 2
 ball_pos.y = pongField_El.height / 2
-right_score+=1;
+left_score+=1;
 dx=-dx
 dy=-dy
 }
@@ -230,20 +263,22 @@ paddle_pos[1].y += speed
   }
 
 
-
 function animate() {
- window.requestAnimationFrame(animate)
  //clear rectangle on every frame
   c.clearRect(0, 0, pongField_El.width, pongField_El.height);
   c.fillStyle = '#000';
   c.fillRect(0, 0, pongField_El.width, pongField_El.height);
 
   //If start is true execute update else execute beginText
-  if(!start){
-    writeStartText()
-  }else{
-    update()
-  }
+      if(!start){
+        writeStartText()
+      }else{
+          update()
+      }
+
 }
 
-animate();
+
+interval = setInterval(()=>{
+    animate()
+},1000 / 60)
