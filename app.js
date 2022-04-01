@@ -1,4 +1,8 @@
-const pongField_El = document.getElementById('pongField');
+const pongField_El = document.getElementById('pongField'),
+      easyBtn_El = document.getElementById('easy'),
+      mediumBtn_El = document.getElementById('medium'),
+      hardBtn_El = document.getElementById('hard'),
+      modal_El = document.getElementById('modal')
 
 const c = pongField_El.getContext('2d');
 
@@ -9,11 +13,14 @@ const { width, height } = { width: 20, height: 100 }; //Width and Height of padd
 
 const padding = 10; //Padding of paddles
 
-const ball_size = { width: 10, height: 10 }; //Ball size
+const radius = 10; //Ball size
+
+//Specify colors
+const colors = ['#1abc9c', '#2ecc71', '#3498db', '#e74c3c', '#9b59b6']
 
 //Specify ball position
 const ball_pos = {
-  x: pongField_El.width / 2 - 5,
+  x: pongField_El.width / 2,
   y: pongField_El.height / 2,
 };
 
@@ -32,16 +39,67 @@ down:false
 let left_score = 0;
 let right_score = 0;
 let start = false;
-let dy = -5; //Ball dy
-let dx = 5; // Ball dx
-let speed = 4; //Speed of paddles
+let dy; //Ball dy
+let dx; // Ball dx
+let speed; //Speed of paddles
 let interval;
+let levels;
+
+
+
+window.addEventListener('DOMContentLoaded', ()=>{
+if(!levels){
+modal_El.classList.add('active')
+}
+})
+
 
 window.addEventListener('keyup', e => {
-  if (e.key === 'Enter') {
+  if (e.key === 'Enter' && levels) {
     start = true;
   }
 });
+
+easyBtn_El.addEventListener('click' , ()=>{
+if(!levels)levels='Easy'
+speed = 3;
+dx = 4;
+dy = -4;
+
+if(levels){
+modal_El.classList.remove('active')
+modal_El.classList.add('hidden')
+}
+
+})
+
+mediumBtn_El.addEventListener('click' , ()=>{
+if(!levels)levels='Medium'
+speed = 5;
+dx = 6;
+dy = -6;
+
+if(levels){
+modal_El.classList.remove('active')
+modal_El.classList.add('hidden')
+}
+
+})
+
+hardBtn_El.addEventListener('click' , ()=>{
+if(!levels)levels='Hard'
+speed = 6;
+dx = 7;
+dy = -7;
+
+if(levels){
+modal_El.classList.remove('active')
+modal_El.classList.add('hidden')
+}
+
+})
+
+
 
 //When key is released then set back direction to its default state
 window.addEventListener('keyup', e => {
@@ -133,25 +191,27 @@ return ball_pos.x < 0
 }
 
 function hitsTopBottom(){
-return ball_pos.y > pongField_El.height - ball_size.height || ball_pos.y < ball_size.height
+return ball_pos.y > pongField_El.height - radius || ball_pos.y < radius
 }
 
 
 function hitsEnemy(){
-return  ball_pos.y <= paddle_pos[1].y + height && ball_pos.y >= paddle_pos[1].y && ball_pos.x == paddle_pos[1].x
+return  ball_pos.y <= paddle_pos[1].y + height && ball_pos.y >= paddle_pos[1].y && ball_pos.x >= paddle_pos[1].x - radius
 }
 
 function hitsPlayer(){
-return  ball_pos.y <= paddle_pos[0].y + height && ball_pos.y >= paddle_pos[0].y && ball_pos.x == paddle_pos[0].x + width
+return  ball_pos.y <= paddle_pos[0].y + height && ball_pos.y >= paddle_pos[0].y && ball_pos.x <= paddle_pos[0].x + (padding + width)
 }
 
 
 function checkRightScoreState(){
-if(right_score === 6){
+if(right_score === 5){
+setTimeout(()=>{
 clearInterval(interval)
 c.font= '25px sans-serif'
 c.fillStyle='red'
 c.fillText('Game Over' , pongField_El.width / 2 , 80)
+},100)
 
 setTimeout(()=>{
 window.location.reload()
@@ -161,15 +221,17 @@ window.location.reload()
 }
 
 function checkLeftScoreState(){
-if(left_score === 6){
-    clearInterval(interval)
-    c.font= '25px sans-serif'
-    c.fillStyle='green'
-    c.fillText('You won' , pongField_El.width / 2 , 80)
-    
-    setTimeout(()=>{
-    window.location.reload()
-    },1500)
+if(left_score === 5){
+setTimeout(()=>{
+clearInterval(interval)
+c.font= '28px sans-serif'
+c.fillStyle='green'
+c.fillText('You won' , pongField_El.width / 2 , 80)
+},100)
+
+setTimeout(()=>{
+window.location.reload()
+},1500)
 }
 }
 
@@ -203,10 +265,10 @@ ball_pos.x +=dx;
 ball_pos.y +=dy;
 
 //Computer paddle should track ball position
-if(ball_pos.y < paddle_pos[1].y){
+if(ball_pos.y <= paddle_pos[1].y){
 paddle_pos[1].y -= speed
-}else if(ball_pos.y > paddle_pos[1].y){
-paddle_pos[1].y += speed
+}else if(ball_pos.y >= paddle_pos[1].y){
+paddle_pos[1].y +=speed
 }
 
 }
@@ -235,10 +297,10 @@ paddle_pos[1].y += speed
 
   function drawVerticalLine() {
     c.beginPath();
-    c.moveTo(pongField_El.width / 2, pongField_El.height - 100);
-    c.lineTo(pongField_El.width / 2, 100);
+    c.moveTo(pongField_El.width / 2, pongField_El.height - 140);
+    c.lineTo(pongField_El.width / 2, 140);
     c.lineWidth = 10;
-    c.setLineDash([10, 14]);
+    c.setLineDash([10, 15]);
     c.strokeStyle = '#fff';
     c.stroke();
     c.closePath();
@@ -253,8 +315,9 @@ paddle_pos[1].y += speed
 
   function drawBall() {
    c.fillStyle='#fff'
-   c.fillRect(ball_pos.x,ball_pos.y,ball_size.width,ball_size.height)
-  }
+   c.arc(ball_pos.x , ball_pos.y , radius, 0 ,2 * Math.PI)
+   c.fill()
+}
 
   function drawScores() {
     c.font = '40px sans-serif';
@@ -263,22 +326,25 @@ paddle_pos[1].y += speed
   }
 
 
-function animate() {
+  function animate() {
  //clear rectangle on every frame
   c.clearRect(0, 0, pongField_El.width, pongField_El.height);
-  c.fillStyle = '#000';
+  c.fillStyle = '#0cb8ae'
   c.fillRect(0, 0, pongField_El.width, pongField_El.height);
 
   //If start is true execute update else execute beginText
       if(!start){
         writeStartText()
       }else{
-          update()
+          if(levels){
+              update()
+          }
       }
 
 }
 
-
 interval = setInterval(()=>{
     animate()
 },1000 / 60)
+
+
