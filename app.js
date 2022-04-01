@@ -34,7 +34,7 @@ let right_score = 0;
 let start = false;
 let dy = -5; //Ball dy
 let dx = 5; // Ball dx
-let speed = 5; //Speed of paddles
+let speed = 4; //Speed of paddles
 
 window.addEventListener('keyup', e => {
   if (e.key === 'Enter') {
@@ -99,13 +99,15 @@ window.addEventListener('keydown',changeDirOfLeftPaddle)
   }
 
   function setBoundaryLimits(){
+  //Check if right is in boundary limits
   paddle_pos.forEach((paddle)=>{
-  if(paddle.y + height > pongField_El.height){
-  paddle.y = pongField_El.height - height;
-  }else if(paddle.y + height < height ){
-  paddle.y = 0;
+  if(paddle.y >= pongField_El.height - height){
+    paddle.y = pongField_El.height - height
+  }else if(paddle.y < 0){
+    paddle.y = 0
   }
   })
+
   }
 
   function moveLeftPaddle(){
@@ -125,18 +127,17 @@ function hitsLeft(){
 return ball_pos.x < 0   
 }
 
-
 function hitsTopBottom(){
 return ball_pos.y > pongField_El.height - ball_size.height || ball_pos.y < ball_size.height
 }
 
 
 function hitsEnemy(){
-return  ball_pos.y <= paddle_pos[1].y + height && ball_pos.y > paddle_pos[1].y && ball_pos.x >= paddle_pos[1].x
+return  ball_pos.y <= paddle_pos[1].y + height && ball_pos.y >= paddle_pos[1].y && ball_pos.x == paddle_pos[1].x
 }
 
 function hitsPlayer(){
-return  ball_pos.y <= paddle_pos[0].y + height && ball_pos.y > paddle_pos[0].y && ball_pos.x == paddle_pos[0].x + width
+return  ball_pos.y <= paddle_pos[0].y + height && ball_pos.y >= paddle_pos[0].y && ball_pos.x == paddle_pos[0].x + width
 }
 
 
@@ -154,6 +155,7 @@ ball_pos.x = pongField_El.width / 2
 ball_pos.y = pongField_El.height / 2
 left_score+=1;
 dx=-dx
+dy=-dy
 }
 
 if(hitsRight()){
@@ -161,10 +163,19 @@ ball_pos.x = pongField_El.width / 2
 ball_pos.y = pongField_El.height / 2
 right_score+=1;
 dx=-dx
+dy=-dy
 }
 
 ball_pos.x +=dx;
 ball_pos.y +=dy;
+
+//Computer paddle should track ball position
+if(ball_pos.y < paddle_pos[1].y){
+paddle_pos[1].y -= speed
+}else if(ball_pos.y > paddle_pos[1].y){
+paddle_pos[1].y += speed
+}
+
 }
 
 
