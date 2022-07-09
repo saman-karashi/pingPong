@@ -12,7 +12,6 @@ pongField_El.height = 600;
 const { width, height } = { width: 20, height: 100 }; //Width and Height of paddles
 
 const padding = 10; //Padding of paddles
-
 const radius = 10; //Ball size
 
 //Specify colors
@@ -54,11 +53,11 @@ modal_El.classList.add('active')
 })
 
 
-window.addEventListener('keyup', e => {
-  if (e.key === 'Enter' && levels) {
-    start = true;
-  }
-});
+window.addEventListener('touchstart',(e)=>{
+ if(e.target.id === 'pongField' && levels){
+  start = true
+ }
+})
 
 easyBtn_El.addEventListener('click' , ()=>{
 if(!levels)levels='Easy'
@@ -100,9 +99,12 @@ modal_El.classList.add('hidden')
 })
 
 
-
-//When key is released then set back direction to its default state
 window.addEventListener('keyup', e => {
+  if (levels) {
+    start = true;
+  }
+
+  //When key is released then set back direction to its default state
  if(e.key === 'ArrowUp' || e.key === 'w'){
     direction.up=false;
  }else if(e.key === 'ArrowDown' || e.key === 's'){
@@ -111,16 +113,25 @@ window.addEventListener('keyup', e => {
 });
 
 function changeDirOfLeftPaddle(e){
-    if(e.key === 'ArrowUp' || e.key === 'w'){
-    direction.up=true;
-    }else if(e.key === 'ArrowDown' || e.key === 's'){
-    direction.down=true;
-    }
-    }
+  if(e.key === 'ArrowUp' || e.key === 'w'){
+  direction.up=true;
+  }else if(e.key === 'ArrowDown' || e.key === 's'){
+  direction.down=true;
+  }
+  }
   
 
 //Change direction of left paddle
 window.addEventListener('keydown',changeDirOfLeftPaddle)
+
+//Move paddle based on touch interaction
+window.addEventListener('touchmove',(e)=>{
+if(e.touches[0].clientY < paddle_pos[0].y){
+   paddle_pos[0].y -= speed * 2
+   }else if(e.touches[0].clientY > paddle_pos[0].y){
+   paddle_pos[0].y +=speed * 2
+   }
+})
 
   function draw() {
       //Draw paddle
@@ -265,11 +276,12 @@ ball_pos.x +=dx;
 ball_pos.y +=dy;
 
 //Computer paddle should track ball position
-if(ball_pos.y <= paddle_pos[1].y){
+if(paddle_pos[1].y + height / 2 > ball_pos.y + radius){
 paddle_pos[1].y -= speed
-}else if(ball_pos.y >= paddle_pos[1].y){
+}else if(paddle_pos[1].y + height / 2 < ball_pos.y){
 paddle_pos[1].y +=speed
 }
+
 
 }
 
@@ -288,11 +300,19 @@ paddle_pos[1].y +=speed
     c.font = '40px sans-serif';
     c.fillStyle = '#fff';
     c.textAlign = 'center';
-    c.fillText(
-      'Press Enter key to begin',
-      pongField_El.width / 2,
-      pongField_El.height / 2
-    );
+    if(window.innerWidth > 500){
+      c.fillText(
+        'Press any key to begin',
+        pongField_El.width / 2,
+        pongField_El.height / 2
+      );
+    }else{
+      c.fillText(
+        'Tap the screen to begin',
+        pongField_El.width / 2,
+        pongField_El.height / 2
+      );
+    }
   }
 
   function drawVerticalLine() {
@@ -326,25 +346,22 @@ paddle_pos[1].y +=speed
   }
 
 
-  function animate() {
- //clear rectangle on every frame
+function animate() {
+  //clear rectangle on every frame
   c.clearRect(0, 0, pongField_El.width, pongField_El.height);
   c.fillStyle = '#0cb8ae'
   c.fillRect(0, 0, pongField_El.width, pongField_El.height);
 
   //If start is true execute update else execute beginText
-      if(!start){
-        writeStartText()
-      }else{
-          if(levels){
-              update()
-          }
-      }
-
+    if(!start){
+      writeStartText()
+    }else if(levels){
+      update()
+    }
 }
 
-interval = setInterval(()=>{
-    animate()
+interval=setInterval(()=>{
+animate()
 },1000 / 60)
 
 
